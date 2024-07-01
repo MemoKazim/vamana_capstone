@@ -1,0 +1,41 @@
+<%-include("../partials/header", {title: "Dashboard"})-%>
+<body>
+    <div class="sidebar" data-theme="light">
+        <%-include("../partials/sidebar")-%>
+    </div>
+    <div class="content-home" data-theme="light">
+        <div class="profile">
+            <div>Profile Information</div>
+            <form action="profile/changepassword" method="post">
+                <%data%>
+                <div>
+                    <span class="info">Username</span>
+                    <input class="input" type="text" value="<%=data.username%>" readonly>
+                </div>
+                <div>
+                    <span class="info">E-mail</span>
+                    <input type="email" class="input" value="<%=data.email%>" readonly >
+                </div>
+                <div>
+                    <span class="info">Role</span> <br>
+                    <input type="email" class="input" value="<%=data.role%>" readonly >
+                </div>
+                <div>
+                    <span class="info">Password</span>
+                    <input type="password" class="input" required>
+                </div>
+                <div>
+                    <span class="info">New Password</span>
+                    <input type="password" class="input" required>
+                </div>
+                <div>
+                    <button class="update-button" type="submit">Change Password</button>
+                </div>
+                <div>
+                    <a class="delete-button" href="/profile/deleteaccount">Delete Account</a>
+                </div>
+            </form>
+        </div>
+    </div>
+    </div>
+<%-include("../partials/footer")-%>

@@ -1,0 +1,19 @@
+<%-include("../partials/header", {title: "Dashboard"})-%>
+<body>
+  <div class="sidebar" data-theme="light">
+      <%-include("../partials/sidebar")-%>
+  </div>
+  <div class="content-home" data-theme="light">
+    <%-include("../partials/success", {message: "Your report successfully recorded"})-%>
+  <div class="submit-incident" style="align-self: center; font-size: 2.3rem;">Submit Incident</div>
+  <div class="submit-incident-text" style="align-self: center">
+    <form action="submit" method="post">
+      <textarea class="submit-incident-text" name="description"></textarea>
+      <div class="bottom_text">
+        <input type="submit" class="submit" value="Submit" />
+      </div>
+    </form>
+  </div>
+  </div>
+</div>
+<%-include("../partials/footer")-%>

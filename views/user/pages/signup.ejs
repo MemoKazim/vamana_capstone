@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#7952b3" />
+    <meta name="generator" content="Hugo 0.84.0" />
+    <title>Sign up</title>
+
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+      crossorigin="anonymous"
+    />
+    <link href="css/signin.css" type="text/css" rel="stylesheet" />
+  </head>
+  <body class="text-center">
+    <main class="form-signin">
+      <form action="signup" method="post">
+        <img
+          class="mb-4"
+          src="/images/v.png"
+          alt=""
+          width="72"
+          height="57"
+        />
+        <h1 class="h3 mb-3 fw-normal">Sign up</h1>
+
+        <div class="form-floating">
+          <input
+            type="email"
+            class="form-control"
+            name="email"
+            id="floatingEmail"
+            placeholder="Email"
+            pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$"
+            required
+          />
+          <label for="floatingEmail">Email</label>
+        </div>
+        <div class="form-floating">
+          <input
+            type="text"
+            class="form-control"
+            name="username"
+            id="floatingInput"
+            placeholder="Username"
+            pattern="^(?=.{8,20}$)(?![_.])(?!.*[_.]{2})[a-zA-Z0-9._]+(?<![_.])$"
+            required
+          />
+          <label for="floatingInput">Username</label>
+        </div>
+        <div class="form-floating">
+          <input
+          type="password"
+          class="form-control"
+          name="password"
+          id="floatingPassword"
+          pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}"
+          placeholder="Password"
+          required
+          />
+          <label for="floatingPassword">Password</label>
+          <div id="username-error" class="error-message">
+            - Username must be 8-20 characters long <br>
+            - Only a-z A-Z 0-9 characters are allowed
+          </div>
+          <div id="password-error" class="error-message">
+            - Password must be longer than 9 characters <br>
+            - At least 1 lowercase character <br>
+            - At least 1 uppercase character <br>
+            - At least 1 number <br>
+            - At least 1 special character
+          </div>
+        </div>
+
+        <button class="w-100 btn btn-lg btn-danger" type="submit">
+          Sign up
+        </button>
+        <p class="mt-5 mb-3 text-muted" >&copy; <span id="year"></span></p>
+      </form>
+      <script>
+        const verify = (elem_id, message_id) => {
+          const usernameField = document.getElementById(elem_id)
+          usernameField.addEventListener('input', function () {
+            const input = this;
+            const pattern = new RegExp(input.pattern);
+            const errorMessage = document.getElementById(message_id);
+            if (!pattern.test(input.value)) {
+              errorMessage.style.display = 'block';
+            } else {
+              errorMessage.style.display = 'none';
+            }
+          });
+        }
+        verify("floatingInput", "username-error")
+        verify("floatingPassword", "password-error")
+        document.getElementById("year").innerHTML=new Date().getFullYear();
+      </script>
+    </main>
+  </body>
+</html>

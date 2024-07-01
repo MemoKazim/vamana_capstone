@@ -1,0 +1,16 @@
+<%-include("hamburger")-%>
+<div class="side-item" data-theme="light" onclick="selected(this)">
+    <a href="/admin/profile">
+      <div class="item-logo">
+        <i class="fa-solid fa-user"></i>
+      </div>
+      <div class="item-name">
+        <span>Profile</span>
+      </div>
+    </a>
+  </div>
+<%-include("sidebar-item", {sidebar_navigation: "submit", sidebar_item: "New report", sidebar_logo: '<i class="fa-regular fa-flag"></i>'})-%>
+<%-include("sidebar-item", {sidebar_navigation: "reports", sidebar_item: "Report", sidebar_logo: '<i class="fa-solid fa-bug"></i>'})-%>
+<%-include("changelog")-%>
+<%-include("light")-%>
+<%-include("logoff")-%>

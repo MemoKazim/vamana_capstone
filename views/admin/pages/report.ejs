@@ -1,0 +1,47 @@
+<%-include("../partials/header", {title: "Dashboard"})-%>
+
+<body>
+    <div class="sidebar" data-theme="light">
+        <%-include("../partials/sidebar")-%>
+    </div>
+    <div class="content-home" data-theme="light">
+        <div class="report">
+            <div class="report_h1">Report ID: <%-data._id-%></div>
+            <div class="report_h3">Date: <%-data.date-%></div>
+            <div class="report_h3">Status: <%-data.status-%></div>
+            <div class="report_h3">Stage: <%-data.stage-%></div>
+            <div class="report_h3">Category: <%-data.category-%></div>
+            <div class="report_h3">Description: <br> <%-data.description-%></div>
+            <div class="report_h2" style="align-self: center">Risk Analysis</div>
+            <div class="report_h3">
+                <span class="report_h2">
+                    Reason: 
+                </span>
+                <br>
+                <%-data.reason.description-%> <br>
+                <%-data.reason.details-%> <br>
+            </div>
+            <div class="report_h3">
+                <span class="report_h2">
+                    Potential Thread: 
+                </span>
+                <br>
+                <%-data.potential_threat.impact-%> <br>
+                <%-data.potential_threat.explanation-%> <br>
+            </div>
+            <div class="report_h3"><span class="report_h2">
+                Mitigation: 
+            </span> 
+
+                <br>
+                <%-data.mitigation.steps-%> <br>
+                <%-data.mitigation.explanation-%> <br>
+            </div>
+            <div class="report_h3"><span class="report_h2">
+                Conclusion: 
+            </span> <br>
+                <%-data.conclusion-%>
+            </div>
+        </div>
+    </div>
+<%-include("../partials/footer")-%>
