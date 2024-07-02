@@ -10,6 +10,6 @@ router
   .post("/submit", userController.postSubmit)
   .get("/profile", userController.getProfile)
   .get("/reports", userController.getReports)
-  .get("/report/:id", userController.getReport);
+  .get("/reports/:id", userController.getReport);
 
 module.exports = router;

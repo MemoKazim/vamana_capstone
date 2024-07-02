@@ -13,6 +13,8 @@
                 <th>#</th>
                 <th>ID</th>
                 <th>Target IP</th>
+                <th>Origin Username</th>
+                <th>Origin Email</th>
                 <th>Date</th>
                 <th>Action</th>
               </tr>
@@ -29,6 +31,8 @@
                   <td><%-no-%></td>
                   <td><%-item.id-%></td>
                   <td><%-item.target-%></td>
+                  <td><%-item.origin.username-%></td>
+                  <td><%-item.origin.email-%></td>
                   <td><%-humanReadableDate(item.date)-%></td>
                   <td>
                     <table class="action">

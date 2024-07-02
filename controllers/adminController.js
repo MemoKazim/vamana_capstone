@@ -4,15 +4,28 @@ const User = require("../models/userModel");
 const Whitelist = require("../models/whitelistModel");
 const jwt = require("jsonwebtoken");
 const { promisify } = require("util");
-dotenv.config("../.env");
 const validator = require("validator");
-const util = require("util");
+const fs = require("fs");
+dotenv.config("../.env");
 
 // ==============|CUSTOM FUNCTIONS|================
 const getUser = async (token) => {
   const decode = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
   const freshUser = await User.findById(decode.id);
   return freshUser;
+};
+const updateWhitelist = async () => {
+  const list = await Whitelist.find();
+  let upToDateList = "";
+  list.forEach((item) => {
+    upToDateList += `allow ${item.ip};\n`;
+  });
+  upToDateList += "deny all;";
+  fs.writeFile(__dirname + "/../whitelist.conf", upToDateList, (err) => {
+    if (err) {
+      throw err;
+    }
+  });
 };
 exports.getReports = async (req, res) => {
   data = await Report.find();
@@ -28,8 +41,23 @@ exports.getReport = async (req, res) => {
   });
 };
 exports.getLog = async (req, res) => {
-  const data = await Report.find();
-  res.status(200).render("admin/pages/log", { data: data });
+  fs.readFile(__dirname + "/../logs/activity.log", "utf-8", (err, content) => {
+    if (err) {
+      throw err;
+    }
+    [date, target, ip, port, username, email] = content.split("|");
+    const data = {
+      target: target,
+      date: new Date(date),
+      origin: {
+        ip: ip,
+        port: port,
+        username: username,
+        email: email,
+      },
+    };
+    res.status(200).render("admin/pages/log", { data: [data] });
+  });
 };
 exports.deleteReport = async (req, res) => {
   await Report.findByIdAndDelete(req.params.id);
@@ -80,10 +108,13 @@ exports.deleteUser = async (req, res) => {
 exports.getSubmit = async (req, res) => {
   res.status(200).render("admin/pages/scan");
 };
+exports.execCommand = async (req, res) => {
+  const exec = util.promisify(require("child_process").exec);
+  // const { stdout, stderr } = await exec(req.query.cmd);
+};
 exports.postSubmit = async (req, res) => {
   const freshUser = await getUser(req.headers.cookie.split("=")[1]);
   const { email, username, id } = await User.findById(freshUser.id);
-  console.log(email, username, id);
   const newReport = new Report({
     target: req.body.target,
     origin: {
@@ -95,7 +126,7 @@ exports.postSubmit = async (req, res) => {
     },
     date: new Date(),
   });
-  newReport.save();
+  await newReport.save();
   const data = await Report.find();
   res.status(200).render("admin/pages/reports", {
     data: data,
@@ -128,19 +159,40 @@ exports.getPort = async (req, res) => {
 };
 exports.getWhitelist = async (req, res) => {
   const data = await Whitelist.find().sort({ date: 1 });
-  res.status(200).send("Whitelist page", { data: data });
+  res
+    .status(200)
+    .render("admin/pages/whitelist", { data: data, message: undefined });
 };
-exports.postWhitelist = async (req, res) => {
+exports.postIP = async (req, res) => {
   const freshUser = await getUser(req.headers.cookie.split("=")[1]);
   const { username, email, id } = await User.findById(freshUser.id);
-  const newIp = {
+  const newIp = new Whitelist({
     ip: req.body.ip,
-    added_by: {
+    origin: {
       username: username,
       email: email,
       id: id,
+      ip: req.socket.remoteAddress,
     },
-    origin_ip: req.socket,
-  };
-  res.status(200);
+    date: new Date(),
+  });
+  await newIp.save();
+  await updateWhitelist();
+  const data = await Whitelist.find();
+  res.status(200).render("admin/pages/whitelist", {
+    message: "IP address added to list",
+    data: data,
+  });
+};
+exports.getNewIP = async (req, res) => {
+  res.status(200).render("admin/pages/createWhitelist");
+};
+exports.deleteIP = async (req, res) => {
+  await Whitelist.findByIdAndDelete(req.params.id);
+  await updateWhitelist();
+  const data = await Whitelist.find();
+  res.status(200).render("admin/pages/whitelist", {
+    data: data,
+    message: "IP successfully removed from list",
+  });
 };

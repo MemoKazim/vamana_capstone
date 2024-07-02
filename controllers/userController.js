@@ -5,6 +5,7 @@ const jwt = require("jsonwebtoken");
 const { promisify } = require("util");
 dotenv.config("../.env");
 const util = require("util");
+const fs = require("fs");
 
 // ==============|CUSTOM FUNCTIONS|================
 const getUser = async (token) => {
@@ -12,7 +13,27 @@ const getUser = async (token) => {
   const freshUser = await User.findById(decode.id);
   return freshUser;
 };
-
+const humanReadableDate = (date) => {
+  const givenDate = new Date(date);
+  const formatter = new Intl.DateTimeFormat("en-US", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  });
+  const formattedDate = formatter.format(date);
+  return `${formattedDate} ${givenDate.getHours()}:${givenDate.getMinutes()}:${givenDate.getSeconds()}`;
+};
+const saveLog = async (id) => {
+  const last = await Report.findById(id);
+  let lastLog = `${humanReadableDate(last.date)}|${last.target}|${
+    last.origin.ip
+  }|${last.origin.port}|${last.origin.username}|${last.origin.email}`;
+  fs.appendFile(__dirname + "/../logs/activity.log", lastLog, (err) => {
+    if (err) {
+      throw err;
+    }
+  });
+};
 exports.execCommand = async (req, res) => {
   const exec = util.promisify(require("child_process").exec);
   // const { stdout, stderr } = await exec(req.query.cmd);
@@ -26,7 +47,23 @@ exports.getSubmit = async (req, res) => {
   res.status(200).render("user/pages/scan", { id: freshUser.id });
 };
 exports.postSubmit = async (req, res) => {
-  const data = await Report.find();
+  const { username, email, id } = await getUser(
+    req.headers.cookie.split("=")[1]
+  );
+  const data = await Report.find({ "origin.id": id });
+  const newSubmit = new Report({
+    target: req.body.target,
+    origin: {
+      username: username,
+      email: email,
+      id: id,
+      ip: req.socket.remoteAddress,
+      port: req.socket.remotePort,
+    },
+    date: new Date(),
+  });
+  await newSubmit.save();
+  saveLog(newSubmit.id);
   res.status(200).render("user/pages/reports", {
     data: data,
     message: "Your scan is processing",
@@ -60,7 +97,8 @@ exports.getReport = async (req, res) => {
   res.status(200).render("user/pages/report", { data: data });
 };
 exports.getReports = async (req, res) => {
-  const data = await Report.find();
+  const { id } = await getUser(req.headers.cookie.split("=")[1]);
+  const data = await Report.find({ "origin.id": id });
   res
     .status(200)
     .render("user/pages/reports", { data: data, message: undefined });
