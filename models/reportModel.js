@@ -7,16 +7,15 @@ const reportShcema = new mongoose.Schema({
     require: [true, "You must specify target (ip / hostname)"],
   },
   ports: [Object],
-  scanned_by: {
+  origin: {
     username: String,
     email: String,
+    id: ObjectId,
+    ip: String,
+    port: String,
   },
   result: {
     type: String,
-  },
-  connection: {
-    ip: String,
-    port: String,
   },
   date: {
     type: Date,

@@ -135,6 +135,7 @@ input:disabled[type="email"] {
   min-width: 400px;
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
   border-radius: 8px;
+  font-family: "Reddit Mono", monospace;
 }
 
 .styled-table thead tr {
@@ -433,11 +434,6 @@ input:disabled[type="email"] {
   font-size: 0.9em;
   min-width: 400px;
 }
-.content-home > div {
-  text-align: left;
-  align-self: flex-start;
-  margin-bottom: 1.5rem;
-}
 .content-home {
   font-size: 1.4rem;
 }
@@ -488,5 +484,41 @@ input:disabled[type="email"] {
   width: 100%;
   text-align: center;
   font-size: 2rem;
+  margin-bottom: 1rem;
+}
+.port-report {
+  align-self: center;
+  width: 60%;
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+.port-card {
+  font-family: "Reddit Mono", monospace;
+  padding: 12px;
+  border: 1px solid #222;
+  width: 400px;
+  min-height: 100px;
+  box-shadow: rgba(50, 50, 93, 0.25) 0px 30px 60px -12px,
+    rgba(0, 0, 0, 0.3) 0px 18px 36px -18px;
+  border-radius: 10px;
+}
+.port-service {
+  display: block;
+  margin-bottom: 1rem;
+}
+.port-number {
+  display: block;
+  margin-bottom: 20px;
+}
+.port-card > div {
+  display: flex;
+  justify-content: space-between;
+}
+.scan-result {
+  width: 100%;
+  text-align: center;
+  font-size: 2.5rem;
   margin-bottom: 1rem;
 }

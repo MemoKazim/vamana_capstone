@@ -1,6 +1,7 @@
 const dotenv = require("dotenv");
 const Report = require("../models/reportModel");
 const User = require("../models/userModel");
+const Whitelist = require("../models/whitelistModel");
 const jwt = require("jsonwebtoken");
 const { promisify } = require("util");
 dotenv.config("../.env");
@@ -30,23 +31,12 @@ exports.getLog = async (req, res) => {
   const data = await Report.find();
   res.status(200).render("admin/pages/log", { data: data });
 };
-exports.postReport = async (req, res) => {
-  const report = {
-    desciprtion: req.body.desciprtion,
-    status: "In Progress",
-    stage: "Submitted",
-  };
-  const newReport = new Report(report);
-  await newReport.save();
-  res
-    .status(200)
-    .render("admin/pages/reports", { message: "Success", code: 0 });
-};
 exports.deleteReport = async (req, res) => {
-  await Report.findByIdAndRemove(req.params.id);
+  await Report.findByIdAndDelete(req.params.id);
+  const data = await Report.find();
   res
     .status(200)
-    .render("admin/pages/reports", { message: "Success", code: 0 });
+    .render("admin/pages/reports", { message: "Success", data: data });
 };
 exports.getDashboard = async (req, res) => {
   res.status(200).render("admin/pages/home", {
@@ -88,10 +78,24 @@ exports.deleteUser = async (req, res) => {
   });
 };
 exports.getSubmit = async (req, res) => {
-  const freshUser = await getUser(req.headers.cookie.split("=")[1]);
-  res.status(200).render("admin/pages/scan", { id: freshUser.id });
+  res.status(200).render("admin/pages/scan");
 };
 exports.postSubmit = async (req, res) => {
+  const freshUser = await getUser(req.headers.cookie.split("=")[1]);
+  const { email, username, id } = await User.findById(freshUser.id);
+  console.log(email, username, id);
+  const newReport = new Report({
+    target: req.body.target,
+    origin: {
+      email: email,
+      username: username,
+      ip: req.socket.remoteAddress,
+      id: id,
+      port: req.socket.remotePort,
+    },
+    date: new Date(),
+  });
+  newReport.save();
   const data = await Report.find();
   res.status(200).render("admin/pages/reports", {
     data: data,
@@ -115,4 +119,28 @@ exports.updateUser = async (req, res) => {
   res
     .status(200)
     .render("admin/pages/users", { message: "User successfully updated!" });
+};
+exports.getAllPort = async (req, res) => {
+  res.status(200).send("All Port page");
+};
+exports.getPort = async (req, res) => {
+  res.status(200).send("Specific Port page");
+};
+exports.getWhitelist = async (req, res) => {
+  const data = await Whitelist.find().sort({ date: 1 });
+  res.status(200).send("Whitelist page", { data: data });
+};
+exports.postWhitelist = async (req, res) => {
+  const freshUser = await getUser(req.headers.cookie.split("=")[1]);
+  const { username, email, id } = await User.findById(freshUser.id);
+  const newIp = {
+    ip: req.body.ip,
+    added_by: {
+      username: username,
+      email: email,
+      id: id,
+    },
+    origin_ip: req.socket,
+  };
+  res.status(200);
 };

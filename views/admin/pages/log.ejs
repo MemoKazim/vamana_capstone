@@ -16,14 +16,20 @@
                   </tr>
                 </thead>
                 <tbody>
+                  <%const humanReadableDate = (date) => {
+                    const givenDate = new Date(date);
+                    const formatter = new Intl.DateTimeFormat('en-US', { day: '2-digit', month: '2-digit', year: 'numeric' });
+                    const formattedDate = formatter.format(date);
+                    return `${formattedDate} ${givenDate.getHours()}:${givenDate.getMinutes()}:${givenDate.getSeconds()}`
+                  }%>
                   <%let no = 1;data.forEach((item)=>{%>
                     <tr>
                       <td><%-no-%></td>
-                      <td><%-item.date-%></td>
-                      <td><%-item.connection.ip-%></td>
-                      <td><%-item.connection.port-%></td>
-                      <td><%-item.username-%></td>
-                      <td><%-item.email-%></td>
+                      <td><%-humanReadableDate(item.date)-%></td>
+                      <td><%-item.origin.ip-%></td>
+                      <td><%-item.origin.port-%></td>
+                      <td><%-item.origin.username-%></td>
+                      <td><%-item.origin.email-%></td>
                     </tr>
                   <%no+=1})%>
                 </tbody>
