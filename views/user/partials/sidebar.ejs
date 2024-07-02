@@ -1,5 +1,6 @@
-<%-include("hamburger")-%>
-<div class="side-item" data-theme="light" onclick="selected(this)">
+<div class="sidebar-top">
+  <%-include("hamburger")-%>
+  <div class="side-item" data-theme="light" onclick="selected(this)">
     <a href="/user/profile">
       <div class="item-logo">
         <i class="fa-solid fa-user"></i>
@@ -9,8 +10,10 @@
       </div>
     </a>
   </div>
-<%-include("sidebar-item", {sidebar_navigation: "submit", sidebar_item: "New report", sidebar_logo: '<i class="fa-regular fa-flag"></i>'})-%>
-<%-include("sidebar-item", {sidebar_navigation: "reports", sidebar_item: "Report", sidebar_logo: '<i class="fa-solid fa-bug"></i>'})-%>
-<%-include("changelog")-%>
-<%-include("light")-%>
-<%-include("logoff")-%>
+  <%-include("sidebar-item", {sidebar_navigation: "submit", sidebar_item: "New scan", sidebar_logo: '<i class="fa-solid fa-magnifying-glass"></i>'})-%>
+  <%-include("sidebar-item", {sidebar_navigation: "reports", sidebar_item: "Scans", sidebar_logo: '<i class="fa-solid fa-clock-rotate-left"></i>'})-%>
+</div>
+<div class="sidebar-bottom">
+  <%-include("light")-%>
+  <%-include("sidebar-item", {sidebar_navigation: "../logoff", sidebar_item: "Logoff", sidebar_logo: '<i class="fa-solid fa-door-open" style="color: #ff0000"></i>'})-%>
+</div>

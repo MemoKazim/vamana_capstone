@@ -1,33 +1,22 @@
+const { ObjectId } = require("mongodb");
 const mongoose = require("mongoose");
 
 const reportShcema = new mongoose.Schema({
-  description: {
+  target: {
+    type: String,
+    require: [true, "You must specify target (ip / hostname)"],
+  },
+  ports: [Object],
+  scanned_by: {
+    username: String,
+    email: String,
+  },
+  result: {
     type: String,
   },
-  status: {
-    type: String,
-  },
-  stage: {
-    type: String,
-    enum: ["Submitted", "Reviewed", "Investigating", "Resolved"],
-  },
-  category: {
-    type: String,
-  },
-  severity: {
-    type: String,
-  },
-  reason: {
-    type: Object,
-  },
-  potential_threat: {
-    type: Object,
-  },
-  mitigation: {
-    type: Object,
-  },
-  conclusion: {
-    type: String,
+  connection: {
+    ip: String,
+    port: String,
   },
   date: {
     type: Date,

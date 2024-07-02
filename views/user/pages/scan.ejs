@@ -1,0 +1,16 @@
+<%-include("../partials/header", {title: "Dashboard"})-%>
+<body>
+  <div class="sidebar" data-theme="light">
+      <%-include("../partials/sidebar")-%>
+  </div>
+  <div class="content-home" data-theme="light">
+    <form action="submit" method="post" class="scan-form">
+      <div class="scan-header">Scan for IP</div>
+      <input class="scan-box" name="description" pattern="(((^|\.)((25[0-5]_*)|(2[0-4]\d_*)|(1\d\d_*)|([1-9]?\d_*))){4}_*$)" required>
+      <div class="bottom-text">
+        <input type="submit" class="submit-button" value="Submit" />
+      </div>
+    </form>
+  </div>
+</div>
+<%-include("../partials/footer")-%>

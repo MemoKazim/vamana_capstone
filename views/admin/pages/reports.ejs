@@ -4,14 +4,15 @@
         <%-include("../partials/sidebar")-%>
     </div>
     <div class="content-home" data-theme="light">
+      <%if (message){%>
+        <%-include("../partials/success", {message: message})-%>
+      <%}%>
         <table class="styled-table table">
             <thead>
               <tr>
                 <th>#</th>
                 <th>ID</th>
-                <th>Description</th>
-                <th>Status</th>
-                <th>Stage</th>
+                <th>Target IP</th>
                 <th>Date</th>
                 <th>Action</th>
               </tr>
@@ -21,9 +22,7 @@
                 <tr>
                   <td><%-no-%></td>
                   <td><%-item.id-%></td>
-                  <td><%-item.description.substring(0,100)-%>...</td>
-                  <td><%-item.status-%></td>
-                  <td><%-item.stage-%></td>
+                  <td><%-item.ip-%></td>
                   <td><%-item.date-%></td>
                   <td>
                     <table class="action">

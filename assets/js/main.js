@@ -67,6 +67,11 @@ const expandSidebar = () => {
   sessionStorage.setItem("sidebarCollapse", null);
 };
 
+const closeMessage = () => {
+  messagebox = document.getElementById("success-message");
+  messagebox.style.display = "none";
+};
+
 const sidebarCollapse = sessionStorage.getItem("sidebarCollapse");
 const sidebarStatus = document.querySelector("#resize");
 const item_names = document.querySelectorAll(".item-name");

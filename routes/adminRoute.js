@@ -10,15 +10,19 @@ router
 
 router
   .get("/reports", adminController.getReports)
-  .put("/reports/update/:id", adminController.updateReport)
+  .get("/reports/delete/:id", adminController.deleteReport)
   .get("/reports/:id", adminController.getReport)
   .post("/reports/:id", adminController.postReport)
-  .delete("/reports/:id", adminController.deleteReport)
   .get("/dashboard", adminController.getDashboard)
   .post("/profile/changepassword", adminController.changePassword)
   .get("/profile", adminController.getProfile)
+  .get("/submit", adminController.getSubmit)
+  .post("/submit", adminController.postSubmit)
+  .get("/log", adminController.getLog)
   .get("/users", adminController.getUsers)
-  .get("/users/:id", adminController.getUser)
-  .delete("/users/:id", adminController.deleteUser);
+  .post("/users/update/:id", adminController.updateUser)
+  .get("/users/update/:id", adminController.updateUserPage)
+  .get("/users/delete/:id", adminController.deleteUser)
+  .get("/users/:id", adminController.getUser);
 
 module.exports = router;

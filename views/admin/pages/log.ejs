@@ -1,0 +1,32 @@
+<%-include("../partials/header", {title: "Dashboard"})-%>
+<body>
+    <div class="sidebar" data-theme="light">
+        <%-include("../partials/sidebar")-%>
+    </div>
+    <div class="content-home" data-theme="light">
+            <table class="styled-table table">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Date</th>
+                    <th>Source IP</th>
+                    <th>Source Port</th>
+                    <th>Username</th>
+                    <th>Email</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <%let no = 1;data.forEach((item)=>{%>
+                    <tr>
+                      <td><%-no-%></td>
+                      <td><%-item.date-%></td>
+                      <td><%-item.connection.ip-%></td>
+                      <td><%-item.connection.port-%></td>
+                      <td><%-item.username-%></td>
+                      <td><%-item.email-%></td>
+                    </tr>
+                  <%no+=1})%>
+                </tbody>
+              </table>
+    </div>
+<%-include("../partials/footer")-%>

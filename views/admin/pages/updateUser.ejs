@@ -5,32 +5,32 @@
     </div>
     <div class="content-home" data-theme="light">
         <div class="user">
-            <form>
+            <form action="/admin/users/update/<%=data._id%>" method="post">
                 <div class="user-header">Profile Information</div>
                 <div>
                     <span class="info">Username</span>
-                    <input type="text" class="common-input" value="<%=data.username%>" disabled>
+                    <input type="text" class="common-input" name="username" value="<%=data.username%>">
                 </div>
                 <div>
                     <span class="info">E-mail</span>
-                    <input type="email" class="common-input" value="<%=data.email%>" disabled >
+                    <input type="email" class="common-input" name="email" value="<%=data.email%>">
                 </div>
                 <div>
                     <span class="info">Role</span> <br>
-                    <select name="role" id="role" class="common-input" disabled>
+                    <select name="role" id="role" class="common-input">
                         <%const options=["admin", "user"];options.forEach((option)=>{if (data.role == option){%>
-                        <option value="<%=option%>" selected>
-                            <%-option-%>
-                        </option>
+                            <option value="<%=option%>" selected>
+                                <%-option-%>
+                            </option>
                         <%}else{%>
-                        <option value="<%=option%>">
-                            <%-option-%>
-                        </option>
+                            <option value="<%=option%>">
+                                <%-option-%>
+                            </option>
                         <%}})%>
                     </select>
                 </div>
                 <div class="action-buttons">
-                    <a class="update-button" href="/admin/users/update/<%=data._id%>">Update</a>
+                    <button class="update-button" type="submit">Update</button>
                 </div>
             </form>
         </div>

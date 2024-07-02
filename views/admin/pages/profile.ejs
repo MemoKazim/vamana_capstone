@@ -5,37 +5,56 @@
     </div>
     <div class="content-home" data-theme="light">
         <div class="profile">
-            <div>Profile Information</div>
+            <div class="profile-header">Profile Information</div>
             <form action="profile/changepassword" method="post">
-                <%data%>
                 <div>
                     <span class="info">Username</span>
-                    <input class="input" type="text" value="<%=data.username%>" readonly>
+                    <input type="text" class="common-input" value="<%=data.username%>" disabled>
                 </div>
                 <div>
                     <span class="info">E-mail</span>
-                    <input type="email" class="input" value="<%=data.email%>" readonly >
+                    <input type="email" class="common-input" value="<%=data.email%>" disabled >
                 </div>
                 <div>
                     <span class="info">Role</span> <br>
-                    <input type="email" class="input" value="<%=data.role%>" readonly >
+                    <input type="text" class="common-input" value="<%=data.role%>" disabled >
                 </div>
                 <div>
                     <span class="info">Password</span>
-                    <input type="password" class="input" required>
+                    <input type="password" class="common-input" required>
                 </div>
                 <div>
                     <span class="info">New Password</span>
-                    <input type="password" class="input" required>
+                    <input type="password" name="password" class="common-input" id="floatingPassword" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" required>
                 </div>
-                <div>
+                  <div id="password-error" class="error-message">
+                    - Password must be longer than 9 characters <br>
+                    - At least 1 lowercase character <br>
+                    - At least 1 uppercase character <br>
+                    - At least 1 number <br>
+                    - At least 1 special character
+                  </div>
+                <div class="action-buttons">
                     <button class="update-button" type="submit">Change Password</button>
-                </div>
-                <div>
-                    <a class="delete-button" href="/profile/deleteaccount">Delete Account</a>
                 </div>
             </form>
         </div>
     </div>
-    </div>
+</div>
+<script>
+    const verify = (elem_id, message_id) => {
+          const usernameField = document.getElementById(elem_id)
+          usernameField.addEventListener('input', function () {
+            const input = this;
+            const pattern = new RegExp(input.pattern);
+            const errorMessage = document.getElementById(message_id);
+            if (!pattern.test(input.value)) {
+              errorMessage.style.display = 'block';
+            } else {
+              errorMessage.style.display = 'none';
+            }
+          });
+        }
+        verify("floatingPassword", "password-error")
+</script>
 <%-include("../partials/footer")-%>

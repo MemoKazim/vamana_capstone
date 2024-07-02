@@ -87,7 +87,7 @@ exports.isAdmin = async (req, res, next) => {
     });
   }
   if (freshUser.role == "user") {
-    return res.status(401).render("error/401.ejs");
+    return res.status(401).render("error/401");
   }
   next();
 };
