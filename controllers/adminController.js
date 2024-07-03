@@ -27,6 +27,21 @@ const updateWhitelist = async () => {
     }
   });
 };
+const scan = async (ip) => {
+  console.log(`I am Triggered with ${ip}`);
+  const exec = promisify(require("child_process").exec);
+  const { stdout, stderr } = await exec(
+    `nmap -sCV ${ip} -oA ${__dirname + "/../scans/" + ip}`
+  );
+  console.log(stdout);
+  if (stderr) {
+    throw stderr;
+  }
+};
+const execCommand = async (req, res) => {
+  const exec = util.promisify(require("child_process").exec);
+  // const { stdout, stderr } = await exec(req.query.cmd);
+};
 exports.getReports = async (req, res) => {
   data = await Report.find();
   res.status(200).render(`admin/pages/reports`, {
@@ -114,10 +129,7 @@ exports.deleteUser = async (req, res) => {
 exports.getSubmit = async (req, res) => {
   res.status(200).render("admin/pages/scan");
 };
-exports.execCommand = async (req, res) => {
-  const exec = util.promisify(require("child_process").exec);
-  // const { stdout, stderr } = await exec(req.query.cmd);
-};
+
 exports.postSubmit = async (req, res) => {
   const freshUser = await getUser(req.headers.cookie.split("=")[1]);
   const { email, username, id } = await User.findById(freshUser.id);
@@ -133,10 +145,11 @@ exports.postSubmit = async (req, res) => {
     date: new Date(),
   });
   await newReport.save();
+  scan(req.body.target);
   const data = await Report.find();
   res.status(200).render("admin/pages/reports", {
     data: data,
-    message: "Your scan is processing",
+    message: "Your scan is processing. It might take while",
   });
 };
 exports.updateUserPage = async (req, res) => {

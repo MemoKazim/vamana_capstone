@@ -1,3 +1,5 @@
 assets/uploads/*
 node_modules/*
 .env
+scans/*
+logs/*
