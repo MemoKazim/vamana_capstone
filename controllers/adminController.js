@@ -30,17 +30,29 @@ const updateWhitelist = async () => {
 const scan = async (ip) => {
   console.log(`I am Triggered with ${ip}`);
   const exec = promisify(require("child_process").exec);
-  const { stdout, stderr } = await exec(
+  const { stderr } = await exec(
     `nmap -sCV ${ip} -oA ${__dirname + "/../scans/" + ip}`
   );
-  console.log(stdout);
+  console.log("Scan Complated!");
   if (stderr) {
-    throw stderr;
+    console.log(stderr);
   }
 };
-const execCommand = async (req, res) => {
+const execCommand = async (command) => {
   const exec = util.promisify(require("child_process").exec);
-  // const { stdout, stderr } = await exec(req.query.cmd);
+  const { stdout, stderr } = await exec(command);
+  if (stderr) return stderr;
+  else return stdout;
+};
+const getOpenPorts = async (ip) => {
+  let out = "";
+  fs.readFile(__dirname + `/../scans/${ip}.nmap`, "utf-8", (err, content) => {
+    if (err) {
+      throw err;
+    }
+    out = execCommand(`cat ${__dirname + "/../" + ip}.nmap | grep open`);
+  });
+  return out;
 };
 exports.getReports = async (req, res) => {
   data = await Report.find();
@@ -133,8 +145,12 @@ exports.getSubmit = async (req, res) => {
 exports.postSubmit = async (req, res) => {
   const freshUser = await getUser(req.headers.cookie.split("=")[1]);
   const { email, username, id } = await User.findById(freshUser.id);
+  await scan(req.body.target);
+  let ports = await getOpenPorts();
+  ports = ports.split("/")[0];
   const newReport = new Report({
     target: req.body.target,
+    ports: ports,
     origin: {
       email: email,
       username: username,
@@ -144,8 +160,8 @@ exports.postSubmit = async (req, res) => {
     },
     date: new Date(),
   });
-  await newReport.save();
-  scan(req.body.target);
+
+  newReport.save();
   const data = await Report.find();
   res.status(200).render("admin/pages/reports", {
     data: data,
