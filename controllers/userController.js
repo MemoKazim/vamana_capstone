@@ -27,7 +27,7 @@ const saveLog = async (id) => {
   const last = await Report.findById(id);
   let lastLog = `${humanReadableDate(last.date)}|${last.target}|${
     last.origin.ip
-  }|${last.origin.port}|${last.origin.username}|${last.origin.email}`;
+  }|${last.origin.port}|${last.origin.username}|${last.origin.email}\n`;
   fs.appendFile(__dirname + "/../logs/activity.log", lastLog, (err) => {
     if (err) {
       throw err;

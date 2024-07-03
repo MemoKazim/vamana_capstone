@@ -45,18 +45,24 @@ exports.getLog = async (req, res) => {
     if (err) {
       throw err;
     }
-    [date, target, ip, port, username, email] = content.split("|");
-    const data = {
-      target: target,
-      date: new Date(date),
-      origin: {
-        ip: ip,
-        port: port,
-        username: username,
-        email: email,
-      },
-    };
-    res.status(200).render("admin/pages/log", { data: [data] });
+    const data = [];
+    content.split("\n").forEach((item) => {
+      if (item != "") {
+        [date, target, ip, port, username, email] = item.split("|");
+        const line = {
+          target: target,
+          date: new Date(date),
+          origin: {
+            ip: ip,
+            port: port,
+            username: username,
+            email: email,
+          },
+        };
+        data.push(line);
+      }
+    });
+    res.status(200).render("admin/pages/log", { data: data });
   });
 };
 exports.deleteReport = async (req, res) => {
