@@ -9,9 +9,7 @@ dotenv.config("./.env");
 
 mongoose.set("strictQuery", true);
 mongoose
-  .connect(DB, {
-    useUnifiedTopology: true,
-  })
+  .connect(DB)
   .then(() => {
     console.log("DB successfully connected!");
   })

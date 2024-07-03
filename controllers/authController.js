@@ -59,7 +59,7 @@ exports.forgotPassword = async (req, res) => {
 };
 exports.isAuthenticated = async (req, res, next) => {
   if (!req.headers.cookie || req.headers.cookie === undefined) {
-    return res.sendFile(__dirname + "/../views/error/401");
+    return res.render("error/401");
   }
   let token = req.headers.cookie.split("=")[1];
 

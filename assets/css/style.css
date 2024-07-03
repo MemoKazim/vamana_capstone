@@ -494,6 +494,7 @@ input:disabled[type="email"] {
   justify-content: space-around;
   flex-wrap: wrap;
   gap: 1rem;
+  overflow-y: scroll;
 }
 .port-card {
   font-family: "Reddit Mono", monospace;
@@ -501,6 +502,8 @@ input:disabled[type="email"] {
   border: 1px solid #222;
   width: 400px;
   min-height: 100px;
+  color: #222 !important;
+  background-color: #fff !important;
   box-shadow: rgba(50, 50, 93, 0.25) 0px 30px 60px -12px,
     rgba(0, 0, 0, 0.3) 0px 18px 36px -18px;
   border-radius: 10px;

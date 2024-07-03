@@ -6,7 +6,11 @@ const reportShcema = new mongoose.Schema({
     type: String,
     require: [true, "You must specify target (ip / hostname)"],
   },
-  ports: [Object],
+  ports: [{
+    port: Number,
+    service:String,
+    version:String
+  }],
   origin: {
     username: String,
     email: String,

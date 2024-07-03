@@ -31,7 +31,7 @@ const scan = async (ip) => {
   console.log(`I am Triggered with ${ip}`);
   const exec = promisify(require("child_process").exec);
   const { stderr } = await exec(
-    `nmap -sCV ${ip} -oA ${__dirname + "/../scans/" + ip}`
+    `nmap -T4 -sCV ${ip} -oA ${__dirname + "/../scans/" + ip}`
   );
   console.log("Scan Complated!");
   if (stderr) {
@@ -39,19 +39,13 @@ const scan = async (ip) => {
   }
 };
 const execCommand = async (command) => {
-  const exec = util.promisify(require("child_process").exec);
+  const exec = promisify(require("child_process").exec);
   const { stdout, stderr } = await exec(command);
   if (stderr) return stderr;
   else return stdout;
 };
 const getOpenPorts = async (ip) => {
-  let out = "";
-  fs.readFile(__dirname + `/../scans/${ip}.nmap`, "utf-8", (err, content) => {
-    if (err) {
-      throw err;
-    }
-    out = execCommand(`cat ${__dirname + "/../" + ip}.nmap | grep open`);
-  });
+  const out = await execCommand(`grep -Eon '(version="[-a-zA-Z0-9\.\_\\\/\,]*"|name="[-a-zA-Z0-9\.\_\\\/\,]*"|portid="[0-9]{1,5}")' ${__dirname + "/../scans/" + ip + ".xml"} | tail -n +4`)
   return out;
 };
 exports.getReports = async (req, res) => {
@@ -151,12 +145,33 @@ exports.postSubmit = async (req, res) => {
     message: "Your scan is processing. It might take while",
   });
   await scan(req.body.target);
-  let ports = await getOpenPorts();
-  console.log(ports);
-  ports = ports.split("/")[0];
+  let portList = []
+  let out = await getOpenPorts(req.body.target);
+  let current = "23"
+  currentObject = {}
+  out.split("\n").forEach(line => {
+    if (current == line.split(":")[0]){
+      if (line.includes("port")){
+        currentObject.port = line.split('"')[1]
+      }
+      if (line.includes("name")){
+        currentObject.service = line.split('"')[1]
+      }
+      if (line.includes("version")){
+        currentObject.version = line.split('"')[1]
+      }
+    } else {
+      current = line.split(":")[0]
+        portList.push(currentObject)
+      currentObject = {}
+      if (line.includes("port")){
+        currentObject.port = line.split('"')[1]
+      }
+    }
+  })
   const newReport = new Report({
     target: req.body.target,
-    ports: ports,
+    ports: portList,
     origin: {
       email: email,
       username: username,
