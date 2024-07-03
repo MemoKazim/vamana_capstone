@@ -145,8 +145,14 @@ exports.getSubmit = async (req, res) => {
 exports.postSubmit = async (req, res) => {
   const freshUser = await getUser(req.headers.cookie.split("=")[1]);
   const { email, username, id } = await User.findById(freshUser.id);
+  const data = await Report.find();
+  res.status(200).render("admin/pages/reports", {
+    data: data,
+    message: "Your scan is processing. It might take while",
+  });
   await scan(req.body.target);
   let ports = await getOpenPorts();
+  console.log(ports);
   ports = ports.split("/")[0];
   const newReport = new Report({
     target: req.body.target,
@@ -162,11 +168,6 @@ exports.postSubmit = async (req, res) => {
   });
 
   newReport.save();
-  const data = await Report.find();
-  res.status(200).render("admin/pages/reports", {
-    data: data,
-    message: "Your scan is processing. It might take while",
-  });
 };
 exports.updateUserPage = async (req, res) => {
   const singleUser = await User.findById(req.params.id);
