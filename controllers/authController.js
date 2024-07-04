@@ -87,7 +87,7 @@ exports.isAdmin = async (req, res, next) => {
     });
   }
   if (freshUser.role == "user") {
-    return res.status(403).sendFile("error/403.html");
+    return res.status(403).sendFile(__dirname + "views/error/403.html");
   }
   next();
 };
