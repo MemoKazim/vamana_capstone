@@ -5,17 +5,13 @@
         <%-include("../partials/sidebar")-%>
     </div>
     <div class="content-home" data-theme="light">
-        <div class="scan-result">Scan Result</div>
+        <div class="scan-result">Scan Result: <%-data.target-%></div>
         <div class="port-report">
-            <%-include("../partials/portcard", {id:43897534750437, port:"22", service:"nginx", version:"0.11.0"})-%>
-            <%-include("../partials/portcard", {id:43897534750437, port:"23", service:"nginx", version:"0.11.0"})-%>
-            <%-include("../partials/portcard", {id:43897534750437, port:"25", service:"nginx", version:"0.11.0"})-%>
-            <%-include("../partials/portcard", {id:43897534750437, port:"25", service:"nginx", version:"0.11.0"})-%>
-            <%-include("../partials/portcard", {id:43897534750437, port:"25", service:"nginx", version:"0.11.0"})-%>
-            <%-include("../partials/portcard", {id:43897534750437, port:"25", service:"nginx", version:"0.11.0"})-%>
-            <%-include("../partials/portcard", {id:43897534750437, port:"25", service:"nginx", version:"0.11.0"})-%>
+            <%data.ports.forEach(port => {%>
+                <%-include("../partials/portcard", {id:data.id, port:port.port, service:port.service, version:port.version})-%>
+            <%});%>
             <!--END LOOP-->
-            <%-include("../partials/portcard", {id:43897534750437, port:"all", service:"Get Report", version:""})-%>
+            <%-include("../partials/portcard", {id:data.id, port:"all", service:"Get Report", version:""})-%>
         </div>
     </div>
 <%-include("../partials/footer")-%>

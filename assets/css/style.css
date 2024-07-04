@@ -7,7 +7,7 @@ body {
   display: flex;
   width: 100vw;
   height: 100vh;
-  font-family: "Dekko", cursive;
+  font-family: "Reddit Mono", monospace;
   background-color: #d8d8d8;
 }
 a {
@@ -541,4 +541,63 @@ input:disabled[type="email"] {
 .new-ip i {
   width: 20px;
   height: 20px;
+}
+.command-line-box{
+  background-color: #000;
+  color: rgb(46, 255, 46);
+  border-radius: 14px;
+  padding: 15px;
+  font-family: "Fira Code", monospace;
+  font-size: 1rem;
+  max-height: 40rem;
+}
+.command-line-content{
+  max-height: 35rem;
+  overflow: scroll;
+  word-wrap: break-word;
+}
+.command-line-title{
+  display: flex;
+  justify-content: end;
+  align-items: center;
+  gap: 1rem;
+}
+.command-line-1{
+  background-color: red;
+}
+.command-line-2{
+  background-color: yellow;
+}
+.command-line-3{
+  background-color: green;
+}
+.command-title {
+  margin-bottom: 10px;
+  cursor: pointer; 
+  color: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 100%;
+  width: 15px;
+  height: 15px;
+}
+.content-home-result{
+  background: var(--color-bg);
+  width: 100%;
+  height: calc(100% - 1rem);
+  color: var(--color-fg);
+  border-radius: 12px;
+  font-size: 3rem;
+  box-shadow: 0px 0px 14px -3px rgba(0, 0, 0, 0.4);
+  margin: 0.5rem;
+  padding: 1.2rem 1rem 0 1rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 2rem;
+}
+
+.result-1, .result-2{
+  max-width: 40%;
 }

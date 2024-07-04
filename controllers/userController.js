@@ -34,10 +34,38 @@ const saveLog = async (id) => {
     }
   });
 };
-exports.execCommand = async (req, res) => {
-  const exec = util.promisify(require("child_process").exec);
-  // const { stdout, stderr } = await exec(req.query.cmd);
+const scan = async (ip) => {
+  console.log(`I am Triggered with ${ip}`);
+  const exec = promisify(require("child_process").exec);
+  const { stderr } = await exec(
+    `nmap -T4 -sCV ${ip} -oA ${__dirname + "/../scans/" + ip}`
+  );
+  console.log("Scan Complated!");
+  if (stderr) {
+    console.log(stderr);
+  }
 };
+const execCommand = async (command) => {
+  const exec = promisify(require("child_process").exec);
+  const { stdout, stderr } = await exec(command);
+  if (stderr) return stderr;
+  else return stdout;
+};
+const execPort = async (port, ip) => {
+  const exec = promisify(require("child_process").exec);
+  const { stdout, stderr } = await exec(`${__dirname}/../tools/${port}.sh ${ip}`);
+  if (stderr) return stderr;
+  else return stdout;
+};
+const getOpenPorts = async (ip) => {
+  const out = await execCommand(`grep -Eon '(version="[-a-zA-Z0-9\.\_\\\/\,\!\@\#\$\%\^\&\*\(\)\+ ]*"|name="[-a-zA-Z0-9\.\_\\\/\,\!\@\#\$\%\^\&\*\(\)\+ ]*"|portid="[0-9]{1,5}")' ${__dirname + "/../scans/" + ip + ".xml"} | tail -n +4`)
+  return out;
+};
+const getPortInfo = (scanText, port) => {
+  const regex = new RegExp(`(${port}/tcp\\s+open\\s+[^\\n]+(?:\\n\\|[^\\n]*)*)`, 'g');
+  const match = regex.exec(scanText);
+  return match ? match[0] : null;
+}
 exports.getDashboard = async (req, res) => {
   const freshUser = await getUser(req.headers.cookie.split("=")[1]);
   res.status(200).render("user/pages/home", { id: freshUser.id });
@@ -47,27 +75,74 @@ exports.getSubmit = async (req, res) => {
   res.status(200).render("user/pages/scan", { id: freshUser.id });
 };
 exports.postSubmit = async (req, res) => {
-  const { username, email, id } = await getUser(
-    req.headers.cookie.split("=")[1]
-  );
+  const freshUser = await getUser(req.headers.cookie.split("=")[1]);
+  const { email, username, id } = await User.findById(freshUser.id);
   const data = await Report.find({ "origin.id": id });
-  const newSubmit = new Report({
-    target: req.body.target,
-    origin: {
-      username: username,
-      email: email,
-      id: id,
-      ip: req.socket.remoteAddress,
-      port: req.socket.remotePort,
-    },
-    date: new Date(),
-  });
-  await newSubmit.save();
-  saveLog(newSubmit.id);
   res.status(200).render("user/pages/reports", {
     data: data,
-    message: "Your scan is processing",
+    message: "Your scan is processing. It might take while",
   });
+  await scan(req.body.target);
+  let portList = []
+  let out = await getOpenPorts(req.body.target);
+  let current = "23"
+  currentObject = {}
+  let a = out.split("\n")
+  let allResult=""
+  for (const line of a) {
+    if (current == line.split(":")[0]){
+      if (line.includes("port")){
+        currentObject.port = line.split('"')[1]
+        try{
+          let result = await execPort(currentObject.port, req.body.target);
+          if (result){
+            currentObject.result = result
+            allResult += result
+          }
+        } catch {
+          // 
+        }
+      }
+      if (line.includes("name")){
+        currentObject.service = line.split('"')[1]
+      }
+      if (line.includes("version")){
+        currentObject.version = line.split('"')[1]
+      }
+    } else {
+      current = line.split(":")[0]
+        portList.push(currentObject)
+      currentObject = {}
+      if (line.includes("port")){
+        currentObject.port = line.split('"')[1]
+        try{
+          let result = await execPort(currentObject.port, req.body.target);
+          if (result){
+            currentObject.result = result
+            allResult += result
+          }
+        } catch {
+          // 
+        }
+      }
+    }
+  }
+  const newReport = new Report({
+    target: req.body.target,
+    ports: portList,
+    origin: {
+      email: email,
+      username: username,
+      ip: req.socket.remoteAddress,
+      id: id,
+      port: req.socket.remotePort,
+    },
+    result: allResult,
+    date: new Date(),
+  });
+
+  await newReport.save();
+  saveLog(newReport.id);
 };
 exports.getProfile = async (req, res) => {
   const freshUser = await getUser(req.headers.cookie.split("=")[1]);
@@ -102,4 +177,19 @@ exports.getReports = async (req, res) => {
   res
     .status(200)
     .render("user/pages/reports", { data: data, message: undefined });
+};
+exports.getAllPort = async (req, res) => {
+  const {target, result} = await Report.findById(req.params.id)
+  fs.readFile(__dirname+`/../scans/${target}.nmap`, "utf-8", (err, content) =>{
+    if(err) {throw err}
+    res.status(200).render("user/pages/port", {port: "all", data:content, result: result});
+  })
+};
+exports.getPort = async (req, res) => {
+  const {target, ports} = await Report.findById(req.params.id)
+  fs.readFile(__dirname+`/../scans/${target}.nmap`, "utf-8", (err, content) =>{
+    if(err) {throw err}
+    const data = getPortInfo(content, req.params.port)
+    res.status(200).render("user/pages/port", {port: req.params.port, data:data, result: ports});
+  })
 };

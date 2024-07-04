@@ -9,7 +9,8 @@ const reportShcema = new mongoose.Schema({
   ports: [{
     port: Number,
     service:String,
-    version:String
+    version:String,
+    result:String
   }],
   origin: {
     username: String,
@@ -18,9 +19,7 @@ const reportShcema = new mongoose.Schema({
     ip: String,
     port: String,
   },
-  result: {
-    type: String,
-  },
+  result: String,
   date: {
     type: Date,
     default: new Date().getDate(),

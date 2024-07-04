@@ -14,6 +14,27 @@ const getUser = async (token) => {
   const freshUser = await User.findById(decode.id);
   return freshUser;
 };
+const humanReadableDate = (date) => {
+  const givenDate = new Date(date);
+  const formatter = new Intl.DateTimeFormat("en-US", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  });
+  const formattedDate = formatter.format(date);
+  return `${formattedDate} ${givenDate.getHours()}:${givenDate.getMinutes()}:${givenDate.getSeconds()}`;
+};
+const saveLog = async (id) => {
+  const last = await Report.findById(id);
+  let lastLog = `${humanReadableDate(last.date)}|${last.target}|${
+    last.origin.ip
+  }|${last.origin.port}|${last.origin.username}|${last.origin.email}\n`;
+  fs.appendFile(__dirname + "/../logs/activity.log", lastLog, (err) => {
+    if (err) {
+      throw err;
+    }
+  });
+};
 const updateWhitelist = async () => {
   const list = await Whitelist.find();
   let upToDateList = "";
@@ -44,10 +65,21 @@ const execCommand = async (command) => {
   if (stderr) return stderr;
   else return stdout;
 };
+const execPort = async (port, ip) => {
+  const exec = promisify(require("child_process").exec);
+  const { stdout, stderr } = await exec(`${__dirname}/../tools/${port}.sh ${ip}`);
+  if (stderr) return stderr;
+  else return stdout;
+};
 const getOpenPorts = async (ip) => {
-  const out = await execCommand(`grep -Eon '(version="[-a-zA-Z0-9\.\_\\\/\,]*"|name="[-a-zA-Z0-9\.\_\\\/\,]*"|portid="[0-9]{1,5}")' ${__dirname + "/../scans/" + ip + ".xml"} | tail -n +4`)
+  const out = await execCommand(`grep -Eon '(version="[-a-zA-Z0-9\.\_\\\/\,\!\@\#\$\%\^\&\*\(\)\+ ]*"|name="[-a-zA-Z0-9\.\_\\\/\,\!\@\#\$\%\^\&\*\(\)\+ ]*"|portid="[0-9]{1,5}")' ${__dirname + "/../scans/" + ip + ".xml"} | tail -n +4`)
   return out;
 };
+const getPortInfo = (scanText, port) => {
+  const regex = new RegExp(`(${port}/tcp\\s+open\\s+[^\\n]+(?:\\n\\|[^\\n]*)*)`, 'g');
+  const match = regex.exec(scanText);
+  return match ? match[0] : null;
+}
 exports.getReports = async (req, res) => {
   data = await Report.find();
   res.status(200).render(`admin/pages/reports`, {
@@ -149,10 +181,21 @@ exports.postSubmit = async (req, res) => {
   let out = await getOpenPorts(req.body.target);
   let current = "23"
   currentObject = {}
-  out.split("\n").forEach(line => {
+  let a = out.split("\n")
+  let allResult=""
+  for (const line of a) {
     if (current == line.split(":")[0]){
       if (line.includes("port")){
         currentObject.port = line.split('"')[1]
+        try{
+          let result = await execPort(currentObject.port, req.body.target);
+          if (result){
+            currentObject.result = result
+            allResult += result
+          }
+        } catch {
+          // 
+        }
       }
       if (line.includes("name")){
         currentObject.service = line.split('"')[1]
@@ -166,9 +209,18 @@ exports.postSubmit = async (req, res) => {
       currentObject = {}
       if (line.includes("port")){
         currentObject.port = line.split('"')[1]
+        try{
+          let result = await execPort(currentObject.port, req.body.target);
+          if (result){
+            currentObject.result = result
+            allResult += result
+          }
+        } catch {
+          // 
+        }
       }
     }
-  })
+  }
   const newReport = new Report({
     target: req.body.target,
     ports: portList,
@@ -179,10 +231,12 @@ exports.postSubmit = async (req, res) => {
       id: id,
       port: req.socket.remotePort,
     },
+    result: allResult,
     date: new Date(),
   });
 
-  newReport.save();
+  await newReport.save();
+  saveLog(newReport.id);
 };
 exports.updateUserPage = async (req, res) => {
   const singleUser = await User.findById(req.params.id);
@@ -203,10 +257,19 @@ exports.updateUser = async (req, res) => {
     .render("admin/pages/users", { message: "User successfully updated!" });
 };
 exports.getAllPort = async (req, res) => {
-  res.status(200).send("All Port page");
+  const {target, result} = await Report.findById(req.params.id)
+  fs.readFile(__dirname+`/../scans/${target}.nmap`, "utf-8", (err, content) =>{
+    if(err) {throw err}
+    res.status(200).render("admin/pages/port", {port: "all", data:content, result: result});
+  })
 };
 exports.getPort = async (req, res) => {
-  res.status(200).send("Specific Port page");
+  const {target, ports} = await Report.findById(req.params.id)
+  fs.readFile(__dirname+`/../scans/${target}.nmap`, "utf-8", (err, content) =>{
+    if(err) {throw err}
+    const data = getPortInfo(content, req.params.port)
+    res.status(200).render("admin/pages/port", {port: req.params.port, data:data, result: ports});
+  })
 };
 exports.getWhitelist = async (req, res) => {
   const data = await Whitelist.find().sort({ date: 1 });

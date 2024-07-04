@@ -5,13 +5,13 @@
         <%-include("../partials/sidebar")-%>
     </div>
     <div class="content-home" data-theme="light">
-        <div class="scan-result">Scan Result</div>
+        <div class="scan-result">Scan Result: <%-data.target-%></div>
         <div class="port-report">
-            <%data.ports.forEach(port => {%>
+            <%data.ports.forEach(port => {if(port.port){%>
                 <%-include("../partials/portcard", {id:data.id, port:port.port, service:port.service, version:port.version})-%>
-            <%});%>
+            <%}});%>
             <!--END LOOP-->
-            <%-include("../partials/portcard", {id:43897534750437, port:"all", service:"Get Report", version:""})-%>
+            <%-include("../partials/portcard", {id:data.id, port:"all", service:"Get Report", version:""})-%>
         </div>
     </div>
 <%-include("../partials/footer")-%>
