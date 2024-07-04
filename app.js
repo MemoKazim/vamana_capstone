@@ -32,7 +32,7 @@ app
 app.route("/logoff").get(authController.logoff);
 
 app.get("*", (req, res) => {
-  res.status(404).sendFile(__dirname + "views/error/404.html");
+  res.status(404).sendFile("error/404");
 });
 
 module.exports = app;
